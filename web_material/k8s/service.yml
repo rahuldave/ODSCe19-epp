@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: website-service
+  annotations:
+    ingress.kubernetes.io/target-proxy: https-target
+spec:
+  selector:
+    app: website
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 80
+  type: NodePort
