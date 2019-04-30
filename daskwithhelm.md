@@ -128,11 +128,10 @@ dask-worker-77679f5c67-2gbxr      1/1       Running   0          7m
 dask-worker-77679f5c67-2nxcn      1/1       Running   0          7m
 ```
 
-We are going to make some custom changes, to include things like keras, and dask_ml
+Let's add custom changes to include additional Python libraries such as `keras` and `dask_ml`.
 
 ```
-helm list
-helm upgrade dask stable/dask -f config.yaml
+helm upgrade dask stable/dask -f dask_material/config.yaml
 helm status dask
 ```
 
