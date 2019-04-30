@@ -191,6 +191,10 @@ As you see we need to set params on the `ksonnet` app and apply it to the cluste
 
    ![](images/webui.png)
 
+This model can also be run as a [Kubeflow Pipeline](https://www.kubeflow.org/docs/pipelines/tutorials/pipelines-tutorial/). Pipelines can be pretty powerful:
+
+![](images/kubepipe.png)
+
 ## 5. Clean up and dont incur costs!
 
 Run the following command to delete your deployment and related resources:

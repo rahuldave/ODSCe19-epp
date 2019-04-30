@@ -658,6 +658,8 @@ Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorf
 
 
 
+
+
 ## Kubeflow Setup
 
 ## LETS DO IT TOGETHER
@@ -720,9 +722,26 @@ Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorf
 
 ---
 
+## Hyperparameter optimization is a (simple) model parallel
+
+![inline](images/katibdb.png)
+
+---
+
 ## Kubeflow Katib
 
 ## LETS DO IT TOGETHER
+
+---
+
+## What just happened? (is hapenning)
+
+- we launched a pytorch job on our kubernetes cluster
+- it is distributed with 1 master and 2 workers
+- a different set of pods is created for each run
+- k8s takes care of scheduling the runs
+
+We'll do a more detailed example next, with distributing, but with serving, for tensorflow.
 
 ---
 
@@ -732,5 +751,45 @@ Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorf
 
 ---
 
+## Kubeflow supports pipelines!
+
+![right, fit](images/kubepipe.png)
+
+- as usual, each stage is a docker container, though there are lighter weight options defined in a python SDK.
+- run the basic parellel join pipeline [here](https://www.kubeflow.org/docs/pipelines/pipelines-quickstart/)
+
+```python
+def gcs_download_op(url):
+    return dsl.ContainerOp(
+        name='GCS - Download', image='google/cloud-sdk:216.0.0',
+        command=['sh', '-c'],
+        arguments=['gsutil cat $0 | tee $1', url, '/tmp/results.txt'],
+        file_outputs={
+            'data': '/tmp/results.txt',
+        }
+    )
+def echo2_op(text1, text2):
+    return dsl.ContainerOp(
+        name='echo', image='library/bash:4.4.23',
+        command=['sh', '-c'],
+        arguments=['echo "Text 1: $0"; echo "Text 2: $1"', text1, text2]
+    )
+@dsl.pipeline(
+  name='Parallel pipeline',
+  description='Download two messages in parallel and prints the concatenated result.'
+)
+def download_and_join(
+    url1='gs://ml-pipeline-playground/shakespeare1.txt',
+    url2='gs://ml-pipeline-playground/shakespeare2.txt'
+):
+    """A three-step pipeline with first two running in parallel."""
+    download1_task = gcs_download_op(url1)
+    download2_task = gcs_download_op(url2)
+    echo_task = echo2_op(download1_task.output, download2_task.output)
+```
+
+---
+
+# FIN
 
 
