@@ -1,16 +1,11 @@
-# config.yaml
-
 worker:
   env:
-    - name: EXTRA_CONDA_PACKAGES
-      value: scipy seaborn scikit-learn keras matplotlib -c conda-forge
     - name: EXTRA_PIP_PACKAGES
-      value: dask-ml --upgrade
+      value: dask-ml tensorflow keras --upgrade
 
 # We want to keep the same packages on the worker and jupyter environments
 jupyter:
+  enabled: true
   env:
-    - name: EXTRA_CONDA_PACKAGES
-      value: scipy seaborn scikit-learn keras matplotlib -c conda-forge
     - name: EXTRA_PIP_PACKAGES
-      value: dask-ml --upgrade
+      value: dask-ml tensorflow keras --upgrade

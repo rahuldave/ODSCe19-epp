@@ -128,7 +128,23 @@ dask-worker-77679f5c67-2gbxr      1/1       Running   0          7m
 dask-worker-77679f5c67-2nxcn      1/1       Running   0          7m
 ```
 
-Let's add custom changes to include additional Python libraries such as `keras` and `dask_ml`.
+Let's add custom changes to include additional Python libraries such as `keras` and `dask_ml`. Here is the `config.yaml` we use:
+
+```yaml
+worker:
+  env:
+    - name: EXTRA_PIP_PACKAGES
+      value: dask-ml tensorflow keras --upgrade
+
+# We want to keep the same packages on the worker and jupyter environments
+jupyter:
+  enabled: true
+  env:
+    - name: EXTRA_PIP_PACKAGES
+      value: dask-ml tensorflow keras --upgrade
+```
+
+We use this to upgrade our helm install
 
 ```
 helm upgrade dask stable/dask -f dask_material/config.yaml
@@ -161,7 +177,9 @@ The default password is `dask`. This will take you to Jupyter Lab workspace.
 
 ---
 
-We'll run some machine learning code with dask...
+You can get the dask dashboard running using `http://dask-scheduler-external-ip` in the search bar in the upper left-corner:
+
+![](images/dask-dashboard.png)
 
 ---
 

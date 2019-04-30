@@ -666,7 +666,9 @@ Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorf
 
 ---
 
-## More on Kubeflow and KSonnet
+## KSonnet
+
+a ksonnet application? Think of an application as a well-structured directory of Kubernetes manifests, which typically tie together in some way.
 
 ---
 

@@ -16,27 +16,29 @@ This tutorial is a heavily edited version of <https://www.kubeflow.org/docs/gke/
 
 ## 2. IAP
 
-3. The next step is to set up an OAuth Credential to use a [Cloud Identity-Aware Proxy (Cloud IAP)](https://cloud.google.com/iap/docs/) . To do this, first
+The next step is to set up an OAuth Credential to use a [Cloud Identity-Aware Proxy (Cloud IAP)](https://cloud.google.com/iap/docs/) . To do this, first
 
-   1. Set up your OAuth [consent screen](https://console.cloud.google.com/apis/credentials/consent). For **Application Name** use `myapp`, for **support email**, use the email you used to set up GCP. For **Authorized Domain** use `<project-id>.cloud.goog`. The project-id will be of the form `kubeflowe2e-238505`, that is your preject name followed by a number. Now click **Save**.
+1. Set up your OAuth [consent screen](https://console.cloud.google.com/apis/credentials/consent). For **Application Name** use `myapp`, for **support email**, use the email you used to set up GCP. For **Authorized Domain** use `<project-id>.cloud.goog`. The project-id will be of the form `kubeflowe2e-238505`, that is your preject name followed by a number. Now click **Save**.
 
-      ![](https://www.kubeflow.org/docs/images/consent-screen.png)
+   ![](https://www.kubeflow.org/docs/images/consent-screen.png)
 
-   2. On clicking Save, you will be moves over to the [credentials tab](https://console.cloud.google.com/apis/credentials) (it is to the left of the current screen in the current web page).
+2. On clicking Save, you will be moves over to the [credentials tab](https://console.cloud.google.com/apis/credentials) (it is to the left of the current screen in the current web page).
 
-
-      1. Click **Create credentials**, and then click **OAuth client ID**.
-      2. Under **Application type**, select **Web application**.
-      3. In the **Name** box enter any name for your OAuth client ID. This is *not* the name of your application nor the name of your Kubeflow deployment. It’s just a way to help you identify the OAuth client ID.
-      4. In the **Authorized redirect URIs** box, enter the following: `https://<app>.endpoints.<project-id>.cloud.goog/_gcp_gatekeeper/authenticate`. In place of `<app>` use `myapp` and for `<project-id>` use your project-id which will look something like this: `kubeflowe2e-238505`. For this example the endpoint will end up looking like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/_gcp_gatekeeper/authenticate`
-      5. Press **Enter/Return** to add the URI. Check that the URI now appears as a confirmed item under **Authorized redirect URIs**. (It should no longer be editable.)
-      6. Make note of the **client ID** and **client secret** that appear in the OAuth client window. You need them later to enable Cloud IAP.
-
-      ![](https://www.kubeflow.org/docs/images/oauth-credential.png)
+     1. Click **Create credentials**, and then click **OAuth client ID**.
+   2. Under **Application type**, select **Web application**.
+   3. In the **Name** box enter any name for your OAuth client ID. This is *not* the name of your application nor the name of your Kubeflow deployment. It’s just a way to help you identify the OAuth client ID.
+   4. In the **Authorized redirect URIs** box, enter the following: `https://<app>.endpoints.<project-id>.cloud.goog/_gcp_gatekeeper/authenticate`. In place of `<app>` use `myapp` and for `<project-id>` use your project-id which will look something like this: `kubeflowe2e-238505`. For this example the endpoint will end up looking like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/_gcp_gatekeeper/authenticate`
+   5. Press **Enter/Return** to add the URI. Check that the URI now appears as a confirmed item under **Authorized redirect URIs**. (It should no longer be editable.)
+3. Make note of the **client ID** and **client secret** that appear in the OAuth client window. You need them later to enable Cloud IAP.
 
 
+![](https://www.kubeflow.org/docs/images/oauth-credential.png)
 
-      ## 3. Deploy using UI
+
+
+## 3. Deploy using UI
+
+
 
 taken from [here](https://www.kubeflow.org/docs/gke/deploy/deploy-ui/)
 
