@@ -17,6 +17,8 @@ $ gcloud container clusters create dask \
 
 This command creates a new Kubernetes cluster named `dask` in `us-central1-a` zone with 5 instances of `n1-standard-1` Machine type. This cluster will have 5 virtual CPUs and 18.75 GB of memory.
 
+It will also set up `kubectl` to access the cluster `dask` in your new or old project. (This can be done by a command like `gcloud container clusters get-credentials dask --zone us-central1-a --project odscbos041919` as well; substitute your project-id.)
+
 It may take 2-3 minutes to complete.
 
 ![Dask Cluster](./images/new-cluster-dask.png)

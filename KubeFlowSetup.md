@@ -142,6 +142,8 @@ Now you can also do:
 kubectl get all
 ```
 
+You can see all your contexts (in this case clusters) by typing `kubectl config get-contexts`. `set-context` above changes properties of a context. The `gloud container clusters get-credentials` changes the context to the cluster for which the credentials were asked. This can also be accomplished by a command like `kubectl config use-context gke_kubeflowe2e_us-central1-a_myapp`.
+
 ## FIN. Destroying it all
 
 See the end to end example for this tutorial. But generally you must kill your deployment, storage buckets, and reclaim space for any registry images you created!
