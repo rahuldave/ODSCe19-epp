@@ -3,7 +3,7 @@
 worker:
   env:
     - name: EXTRA_CONDA_PACKAGES
-      value: scipy seaborn scikit-learn keras matplotlib -c conda-forge
+      value: scipy seaborn scikit-learn keras -c conda-forge
     - name: EXTRA_PIP_PACKAGES
       value: dask-ml --upgrade
 
