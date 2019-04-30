@@ -1,61 +1,62 @@
-# Kubeflow Setup
+# Kubeflow and ksonnet Setup
 
 ---
 
 This tutorial is a heavily edited version of <https://www.kubeflow.org/docs/gke/gcp-e2e/>. The deployment aspects for GCP are taken from [here](https://www.kubeflow.org/docs/gke/deploy/).
 
-## 1. GCP Basics
+## 1. Create a new GCP project
 
-1. We first need to set up a project in GCP. Create a project called `kubeflowe2e` in the GCP console. This will create a project-id that looks something like `kubeflowe2e-238505`. Make sure that billing is enabled for your project.
-2. Also choose a name for your `app`. We'll call it `myapp`. Remember this for now.
-3. Go to the following pages on the GCP Console and ensure that the specified APIs are enabled on your GCP account:
-   - [Compute Engine API](https://console.cloud.google.com/apis/library/compute.googleapis.com)
+1. We first need to set up a new project in GCP. Create a project called `kubeflowe2e` in the GCP console. This will create a project-id that looks something like `kubeflowe2e-238505`. Make sure that billing is enabled for your project.
+
+2. Ensure that the specified APIs are enabled on this new project:
    - [GKE API](https://console.cloud.google.com/apis/library/container.googleapis.com)
-   - [Identity and Access Management (IAM) API](https://console.cloud.google.com/apis/library/iam.googleapis.com)
    - [Deployment Manager API](https://console.cloud.google.com/apis/library/deploymentmanager.googleapis.com)
 
-## 2. IAP
+## 2. Set up OAuth Credential
 
-The next step is to set up an OAuth Credential to use a [Cloud Identity-Aware Proxy (Cloud IAP)](https://cloud.google.com/iap/docs/) . To do this, first
+The next step is to set up an OAuth Credential to use a [Cloud Identity-Aware Proxy (Cloud IAP)](https://cloud.google.com/iap/docs/) .
 
-1. Set up your OAuth [consent screen](https://console.cloud.google.com/apis/credentials/consent). For **Application Name** use `myapp`, for **support email**, use the email you used to set up GCP. For **Authorized Domain** use `<project-id>.cloud.goog`. The project-id will be of the form `kubeflowe2e-238505`, that is your preject name followed by a number. Now click **Save**.
+1. Click on the navigation toggle button, and scroll down the navigation menu to **API & Services** and click on **Credentials**.
 
-   ![](https://www.kubeflow.org/docs/images/consent-screen.png)
+![Credentials Screen](./images/credentials-menu.png)
 
-2. On clicking Save, you will be moves over to the [credentials tab](https://console.cloud.google.com/apis/credentials) (it is to the left of the current screen in the current web page).
+2. Select OAuth Credential tab
 
-     1. Click **Create credentials**, and then click **OAuth client ID**.
+![OAuth Credential](./images/oauth-menu.png)
+
+For **Application Name** use `myapp`, for **support email**, use the email you used to set up GCP. For **Authorized Domain** use `<project-id>.cloud.goog`. The project-id will be of the form `kubeflowe2e-238505`, that is your preject name followed by a number. Now click **Save**.
+
+3. On clicking Save, you will move back to the Credentials tab.
+
+   1. Click **Create credentials**, and then click **OAuth client ID**.
    2. Under **Application type**, select **Web application**.
-   3. In the **Name** box enter any name for your OAuth client ID. This is *not* the name of your application nor the name of your Kubeflow deployment. It’s just a way to help you identify the OAuth client ID.
-   4. In the **Authorized redirect URIs** box, enter the following: `https://<app>.endpoints.<project-id>.cloud.goog/_gcp_gatekeeper/authenticate`. In place of `<app>` use `myapp` and for `<project-id>` use your project-id which will look something like this: `kubeflowe2e-238505`. For this example the endpoint will end up looking like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/_gcp_gatekeeper/authenticate`
+   3. In the **Name** box enter any name for your OAuth client ID. This is _not_ the name of your application nor the name of your Kubeflow deployment. It’s just a way to help you identify the OAuth client ID.
+   4. In the **Authorized redirect URIs** box, enter the following: `https://<app>.endpoints.<project-id>.cloud.goog/_gcp_gatekeeper/authenticate`. In place of `<app>` use `myapp` and for `<project-id>` use your project-id which will look something like this: `kubeflowe2e-238505`. For this example the endpoint will end up looking like `https://kubeflow.endpoints.kubeflowe2e-238505.cloud.goog/_gcp_gatekeeper/authenticate`
    5. Press **Enter/Return** to add the URI. Check that the URI now appears as a confirmed item under **Authorized redirect URIs**. (It should no longer be editable.)
-3. Make note of the **client ID** and **client secret** that appear in the OAuth client window. You need them later to enable Cloud IAP.
 
+![OAuth Crendital ID](./images/oauth-client-id.png)
 
-![](https://www.kubeflow.org/docs/images/oauth-credential.png)
-
-
+4. Make note of the **client ID** and **client secret** that appear in the OAuth client window. You need them later to enable Cloud IAP.
 
 ## 3. Deploy using UI
 
-
-
-taken from [here](https://www.kubeflow.org/docs/gke/deploy/deploy-ui/)
-
 ![](images/deploy.kubeflow.cloud.png)
+taken from [here](https://www.kubeflow.org/docs/gke/deploy/deploy-ui/)
 
 1.  Open [https://deploy.kubeflow.cloud/](https://deploy.kubeflow.cloud/#/deploy) in your web browser.
 2.  Sign in using a GCP account that has administrator privileges for your GCP project.
 3.  Complete the form, following the instructions on the left side of the form. In particular, ensure that you enter the same **deployment name** as you used when creating the OAuth client ID.
 4.  Click **Create Deployment**.
 
-Kubeflow will be available at the following URI:
+This will take approximately 20 minutes to complete.
+
+Kubeflow dashboard will be available at the following URI:
 
 ```
-https://<app>.endpoints.<project-id>.cloud.goog/
+https://<deployment-name>.endpoints.<project-id>.cloud.goog/
 ```
 
-In our case here it would look like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/`. It can take 10-15 minutes for the URI to become available.
+In our case, it will look like `https://kubeflow.endpoints.kubeflowe2e-238505.cloud.goog/`.
 
 You can watch for updates in the information box on the deployment UI. If the deployment takes longer than expected, try accessing the above URI anyway.
 
@@ -63,32 +64,25 @@ Take a look around the UI.
 
 ![](images/kfdash.png)
 
-When the cluster is ready, you can do the following:
+When the cluster is ready, you can do the following in Cloud Shell:
 
 1. Connect your local `kubectl` session to the cluster:
 
-   ```
-   gcloud container clusters get-credentials \
-       ${DEPLOYMENT_NAME} --zone ${ZONE} --project ${PROJECT}
-   ```
+   `$ gcloud container clusters get-credentials <deployment-name> --zone us-central1-a --project <project-id>`
 
 2. Switch to the `kubeflow` namespace to see the resources on the Kubeflow cluster:
 
-   ```
-   kubectl config set-context $(kubectl config current-context) --namespace=kubeflow
-   ```
+   `$ kubectl config set-context $(kubectl config current-context) --namespace=kubeflow`
 
 3. Check the resources deployed in the `kubeflow` namespace:
 
-   ```
-   kubectl get all
-   ```
+   `$ kubectl get all`
 
 ## 4. Set up ksonnet and storage
 
-ksonnet is a framework for writing, sharing, and deploying Kubernetes application manifests.
+[ksonnet](https://ksonnet.io/) is a framework for writing, sharing, and deploying Kubernetes application manifests.
 
-(1) Run the following lines in the cloud console:
+1. Run the following lines in Cloud Shell:
 
 ```bash
 export KS_VER=0.13.1
@@ -98,17 +92,17 @@ tar -xvf /tmp/$KS_PKG.tar.gz -C ${HOME}/local/bin
 alias ks="~/local/bin/$KS_PKG/ks"
 ```
 
-This will set up a command `ks` which is a helm-like software `ksonnet` to control kubernetes clusters.
+This will set up a command `ks` which is a helm-like software `ksonnet` to administer Kubernetes clusters.
 
-(2) Now let us set up a bunch of environment variables to help us:
+2. Now let us set up several environment variables to help us:
 
 Put the following code in a file `setup.sh` (replace the stuff between angled brackets by the appropriate variables):
 
 ```bash
-export KFAPP="<app>"
+export KFAPP="<deployement-name>"
 export ZONE="<zone-from-gui>"
 export CLIENT_ID="<client-id>"
-export CLIENT_SECRET="<client-secret"
+export CLIENT_SECRET="<client-secret>"
 export KS_VER=0.13.1
 export KS_PKG=ks_${KS_VER}_linux_amd64
 alias ks="~/local/bin/$KS_PKG/ks"
@@ -120,29 +114,11 @@ export KUBEFLOW_VERSION="v0.5-branch"
 export BUCKET_NAME=${PROJECT}-${DEPLOYMENT_NAME}-bucket
 ```
 
-Then, in the cloud shell run the command `source setup.sh`. You will need to do this any time you reconnect to the cloud shell.
+Then, in Cloud Shell run the command `source setup.sh`. You will need to do this any time you reconnect to the cloud shell.
 
-(3) Now we'll create a storage bucket. Type: `gsutil mb -c regional -l us-central1 gs://${BUCKET_NAME}` .This will create us a google storage bucket.
-
-(4) Since the cluster is ready, you can connect your local `kubectl` session to the cluster:
-
-```bash
-gcloud container clusters get-credentials ${DEPLOYMENT_NAME} --zone ${ZONE} --project ${PROJECT}
-kubectl get pods
-kubectl config current-context
-kubectl config set-context $(kubectl config current-context) --namespace=kubeflow
-kubectl get pods
-```
+3. We'll create a storage bucket. Type: `gsutil mb -c regional -l us-central1 gs://${BUCKET_NAME}` .This will create us a google storage bucket.
 
 ![](images/kubectlkfns.png)
-
-Now you can also do:
-
-```
-kubectl get all
-```
-
-You can see all your contexts (in this case clusters) by typing `kubectl config get-contexts`. `set-context` above changes properties of a context. The `gloud container clusters get-credentials` changes the context to the cluster for which the credentials were asked. This can also be accomplished by a command like `kubectl config use-context gke_kubeflowe2e_us-central1-a_myapp`.
 
 ## FIN. Destroying it all
 
