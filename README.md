@@ -1,4 +1,4 @@
-##Evrybody please GET a GCP account!
+## Everybody please GET a GCP account!
 
 # URL is https://github.com/rahuldave/ODSCe19-epp
 
