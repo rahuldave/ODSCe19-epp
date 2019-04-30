@@ -130,6 +130,10 @@ ks delete default -c train
 ks apply default -c train
 ```
 
+The model (and other training stuff) are dumped into our gs bucket. (gs buckets are also supported by Dask and are a simpler alternative to getting data in and out of Kubernetes clusters as compared to PersistentVolumes and PersistentVolumeClaims.)
+
+![](images/bucket.png)
+
 ## 4. Serve and UI your model
 
 (1) Lets serve our model tensorflow-serving!
