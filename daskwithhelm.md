@@ -41,6 +41,8 @@ For now, installing Helm in Google Cloud requires us use an installer script pro
 
 `$ curl -L https://git.io/get_helm.sh | bash`
 
+Copy `helm` into your home directory so you can use it from there if needed. This typically happens when your google cloud console goes down..only your home directory is persisted. (`cp /usr/local/helm ~/`)
+
 Helm comes in two parts -- Helm and Tiller. Tiller is the backend services that communicated with Kubernetes API to administer Helm packages in Kubernetes clusters. Just as the Docker Engine has two components, the Docker CLI and the Docker Daemon, which listens for API requests and manages Docker objects such as images, containers, networks, and volumes, Helm comes with Helm CLI and Tiller.
 
 Figure below maps the relationship between Helm and Tiller and its counterpart in Docker.
@@ -87,7 +89,7 @@ Assign ClusterRoleBinding to the `tiller` service account.
 
 `$ kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller`
 
-Finally, initialize Helm and Tiller by
+Finally, initialize Helm and Tiller by (you may have to use `~/helm`)
 
 `$ helm init --service-account tiller`
 

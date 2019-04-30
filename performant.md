@@ -6,7 +6,7 @@ autoscale: true
 ## Rahul Dave, `univ.ai` and `IACS`, Harvard
 ## Richard Kim, `Markov Lab` and `IACS`, Harvard
 
-![inline, 60%](images/univai.png)
+![inline, 80%](https://static.projects.iq.harvard.edu/files/styles/os_files_medium/public/iacs-new/files/logo.png?m=1456854399&itok=wZXokqdV) ![inline, 88%](images/univai.png) ![inline, 8%](images/IMG_1924.PNG)
 
 ---
 
@@ -21,14 +21,6 @@ autoscale: true
 
 ---
 
-## Whats available in the market (LATER)
-
-- sagemager
-- google
-- neptune.io
-- weights and biases, etc
-
----
 
 ## Hyper-parameter optimization
 
@@ -49,7 +41,7 @@ Eg, **Gradient boosting**: The basic idea is to fit the residuals of tree based 
 
 ---
 
-# Why is this bad?
+## Why is this bad? Or, why pipelines?
 
 ```python
 from sklearn.model_selection import GridSearchCV
@@ -64,6 +56,8 @@ clf = LogisticRegression()
 grid = GridSearchCV(clf, param_grid={'C': [.1, 1, 10, 100]}, cv=5)
 grid.fit(X_train, y_train)
 ```
+
+**The purpose of the pipeline is to assemble several steps that can be cross-validated together while setting different parameters.**
 
 ---
 
@@ -95,39 +89,8 @@ if __name__=='__main__':
     print("Best parameters set:", grid_search.best_estimator_.get_params())
 ```
 
----
-
-From [sklearn.pipeline.Pipeline.html](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html) :
-
-*Sequentially apply a list of transforms and a final estimator. Intermediate steps of the pipeline must be ‘transforms’, that is, they must implement `fit` and `transform` methods. The final estimator only needs to implement `fit`. The transformers in the pipeline can be cached using memory argument.*
-
-**The purpose of the pipeline is to assemble several steps that can be cross-validated together while setting different parameters.**
-
 
 ---
-
-## sklearn pipelines: the bad
-
-```python
-scores = []
-for ngram_range in parameters['vect__ngram_range']:
-        for norm in parameters['tfidf__norm']:
-                for alpha in parameters['clf__alpha']:
-                        vect = CountVectorizer(ngram_range=ngram_range)
-                        X2 = vect.fit_transform(X, y)
-                        tfidf = TfidfTransformer(norm=norm)
-                        X3 = tfidf.fit_transform(X2, y)
-                        clf = SGDClassifier(alpha=alpha)
-                        clf.fit(X3, y)
-                        scores.append(clf.score(X3, y))
-best = choose_best_parameters(scores, parameters)
-```
-
-![right, fit](images/unmerged_grid_search_graph.svg)
-
----
-
-
 
 ##ok, so you want to do this
 
@@ -260,13 +223,13 @@ dependencies:
 
 ---
 
-## usage example: AM207 and thebe-lab
+## usage example: AM207 and thebe-lab/juniper
 
 - see https://github.com/am207/shadowbinder , a repository with an environment file only
 - this repo is used to build a jupyterlab with some requirements where you can work. 
 - see [here](http://am207.info/wiki/doseplacebo.html) for example
 - uses [thebelab](https://github.com/minrk/thebelab)
-- used in the [Spacy Course](http://course.spacy.io) as well
+- juniper used in the [Spacy Course](http://course.spacy.io)
 
 ![right, fit](images/am207lab.png)
 
@@ -345,7 +308,7 @@ best = choose_best_parameters(scores, parameters)
 ---
 
 
-## Hyperparameter optimization using dask
+## Hyperparameter optimization using dask (locally)
 
 ```python
 from keras.models import Sequential
@@ -447,6 +410,14 @@ We need a:
 - think of applications as stateless, and movable from one machine to another to enable better resource utilization
 - thus does not cover mutable databases which must remain outside the cluster
 - there is a controlling master node, and worker nodes
+
+---
+
+## Open AI deep learning setup
+
+- "operate several Kubernetes clusters (some in the cloud and some on physical hardware), the largest of which we’ve pushed to over 2,500 nodes. This cluster runs in Azure on a combination of D15v2 and NC24 VMs." (https://openai.com/blog/scaling-kubernetes-to-2500-nodes/)
+- each job must be a Docker container. They provide tooling to transparently ship code from a researcher’s laptop into a standard image.
+- they use autoscaling
 
 ---
 
@@ -668,7 +639,16 @@ Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorf
 
 ## KSonnet
 
-a ksonnet application? Think of an application as a well-structured directory of Kubernetes manifests, which typically tie together in some way.
+- a ksonnet application? Think of an application as a well-structured directory of Kubernetes manifests, which typically tie together in some way.
+- yet another way of combining the yaml kubernetes needs. Start with`ks init guestbook --context ks-dev  
+`
+- Generation from prototype: e.g. 
+  ```ks generate deployed-service guestbook-ui \
+  --image gcr.io/heptio-images/ks-guestbook-demo:0.1 \
+  --type ClusterIP
+  ```
+- Apply multiple generated components sequentially, do `ks apply default` multiple times
+
 
 ---
 
@@ -793,5 +773,13 @@ def download_and_join(
 ---
 
 # FIN
+
+- making things work performantly in the cloud is not easy
+- but has huge time saving benefits
+- this has been barely an introduction
+- bit its been conceptual, so should help you implement
+- there is another workshop on kubeflow at ODSC
+- binge watch: https://fullstackdeeplearning.com/march2019#
+- Reading: Kubernetes in Action, Cloud Native Devops with Kubernetes, Dask docs, Kubeflow docs.
 
 
