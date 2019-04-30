@@ -86,6 +86,7 @@ Assign ClusterRoleBinding to the `tiller` service account.
 `$ kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller`
 
 Finally, initialize Helm and Tiller by
+
 `$ helm init --service-account tiller`
 
 To check that Helm and Tiller has been initialized correction, use the following command:
@@ -146,10 +147,7 @@ jupyter:
 
 We use this to upgrade our helm install
 
-```
-helm upgrade dask stable/dask -f dask_material/config.yaml
-helm status dask
-```
+`$ helm upgrade dask stable/dask -f dask_material/config.yaml`
 
 ---
 
