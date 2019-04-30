@@ -31,7 +31,7 @@ For **Application Name** use `myapp`, for **support email**, use the email you u
    1. Click **Create credentials**, and then click **OAuth client ID**.
    2. Under **Application type**, select **Web application**.
    3. In the **Name** box enter any name for your OAuth client ID. This is _not_ the name of your application nor the name of your Kubeflow deployment. It’s just a way to help you identify the OAuth client ID.
-   4. In the **Authorized redirect URIs** box, enter the following: `https://<app>.endpoints.<project-id>.cloud.goog/_gcp_gatekeeper/authenticate`. In place of `<app>` use `myapp` and for `<project-id>` use your project-id which will look something like this: `kubeflowe2e-238505`. For this example the endpoint will end up looking like `https://kubeflow.endpoints.kubeflowe2e-238505.cloud.goog/_gcp_gatekeeper/authenticate`
+   4. In the **Authorized redirect URIs** box, enter the following: `https://<deployment-name>.endpoints.<project-id>.cloud.goog/_gcp_gatekeeper/authenticate`. In place of `<deployment-name>` use `myapp` and for `<project-id>` use your project-id which will look something like this: `kubeflowe2e-238505`. For this example the endpoint will end up looking like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/_gcp_gatekeeper/authenticate`
    5. Press **Enter/Return** to add the URI. Check that the URI now appears as a confirmed item under **Authorized redirect URIs**. (It should no longer be editable.)
 
 ![OAuth Crendital ID](./images/oauth-client-id.png)
@@ -56,7 +56,7 @@ Kubeflow dashboard will be available at the following URI:
 https://<deployment-name>.endpoints.<project-id>.cloud.goog/
 ```
 
-In our case, it will look like `https://kubeflow.endpoints.kubeflowe2e-238505.cloud.goog/`.
+In our case, it will look like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/`.
 
 You can watch for updates in the information box on the deployment UI. If the deployment takes longer than expected, try accessing the above URI anyway.
 
