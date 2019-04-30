@@ -694,12 +694,17 @@ Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorf
 - 4 GPUs,  you split a mini-batch with 128 examples into 32 examples for each GPU
 - obtain gradients for each split batch, then average them
 - problem: in backward pass you have to pass the whole gradient to ALL other GPUs. Thus use max-pool or other where params are less..conv layers
-- cuBLAS: dont go below a batch size of 64 for each GPU
-- 
+- better for smaller models like CNN
   
 ---
 
 ## Model small batch sizes vs large batch sizes
+
+- smaller batch size captures obvious, common errors
+- larger batch size also captures subtler, smaller errors.
+- in the beginning a model had major errors so you dont want to fine tune too much, so smaller size better
+- but not too small as you will even miss these larger errors
+- hardware limits us in practice. When you split on gpu dont go below 64 as cuBLAS needs this for efficiency
 
 ---
 
@@ -707,9 +712,10 @@ Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorf
 
 ![right, fit](https://i0.wp.com/timdettmers.com/wp-content/uploads/2014/11/modelpara1.png?resize=1025%2C626)
 
-- supports large models. thus better for fully connected layers
+- supports large models. thus better for fully connected layers, transformers, etc
 - might be really important in future for unsupervised learning
 - synchronization needed after each dot product with the weight matrix for both forward and backward pass.
+- but less data is transferred because of chunking in any weight matrix direction
 - See [Alex Krizhevsky](http://arxiv.org/pdf/1404.5997v2), uses data parallelism in the convolutional layers and model parallelism in the dense layers.
 
 ---

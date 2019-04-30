@@ -158,6 +158,14 @@ docker build ${WORKING_DIR}/web-ui -t ${UI_IMG_PATH}
 docker push ${UI_IMG_PATH}
 ```
 
+You can see our docker images at the google container registry:
+
+![](images/gcrscreen.png)
+
+
+
+Ok, now to install using ksonnet:
+
 ```bash
 cd ${WORKING_DIR}/my_ksonnet_app
 ks param set web-ui image ${UI_IMG_PATH}
