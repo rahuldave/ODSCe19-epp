@@ -9,6 +9,7 @@ worker:
 
 # We want to keep the same packages on the worker and jupyter environments
 jupyter:
+  enabled: true
   env:
     - name: EXTRA_CONDA_PACKAGES
       value: scipy seaborn scikit-learn keras matplotlib -c conda-forge
