@@ -1,4 +1,4 @@
-## Everybody please GET a GCP account!
+## Everybody please GET a GCP account! http://cloud.google.com
 
 There's 300 bucks in free credits which will WAY cover this tutorial.
 
