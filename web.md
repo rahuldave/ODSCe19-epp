@@ -161,7 +161,7 @@ Remember that `<cluster name>` is `website`.
 
 Clone the following repository that we created for this tutorial by running the following command in the Cloud Shell:
 
-`$ git clone https://github.com/MarkovLab/odsc-tutorial.git`
+`$ git clone https://github.com/rahuldave/ODSCe19-epp.git`
 
 <img src="./images/launch-code-editor.png" alt="Launch Code Editor" class="img" />
 
@@ -169,7 +169,7 @@ We will use code editor provided by GCP to read and modify configuration files. 
 
 <img src="./images/code-editor.png" alt="Code Editor" class="img" />
 
-In the `odsc-tutorial/k8s` directory, look for `deployment.yaml` file. It should contain the following specification:
+In the `web_material/k8s` directory, look for `deployment.yaml` file. It should contain the following specification:
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -192,7 +192,7 @@ spec:
 
 This configuration specifies Kubernetes to create a Deployment with the name of website. This Deployment will have 3 pods that each has a nginx container with a containerPort of 80. Create the deployment workload by running the following command in the Cloud Shell:
 
-`$ kubectl apply -f k8s/deployment.yaml`
+`$ kubectl apply -f web_material/k8s/deployment.yaml`
 
 This will immediate create 3 pods, which you can verify by running:
 
@@ -240,7 +240,7 @@ We will not cover all of the Services here in this tutorial.
 Figure above demonstrates how two services - NodePort and Ingress - enable outside
 network to communicate with Pods and access the container inside them.
 
-Take a look at the file "odsc-tutorial/k8s/service.yaml".
+Take a look at the file "web_material/k8s/service.yaml".
 
 ```yaml
 kind: Service
@@ -265,7 +265,7 @@ Also note the "selector" configration with "app: website", which matches the met
 
 Create NodePort service by running the following command in Cloud Shell:
 
-`$ kubectl apply -f k8s/service.yaml`
+`$ kubectl apply -f web_material/k8s/service.yaml`
 
 Next, we create Ingress. In GKE, Ingress defines policies for routing external HTTP(S) traffic to applications running in a Kubernetes cluster.
 
@@ -275,7 +275,7 @@ Before we create an Ingress object, we will create a static IP for the Ingress o
 
 This command will create a static IP address for our application.
 
-Look into the file "odsc-tutorial/k8s/ingress.yaml".
+Look into the file "web_material/k8s/ingress.yaml".
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -294,7 +294,7 @@ Note that "serviceName" of "backend" matches that of NodePort service name and t
 
 Create an Ingress object by running:
 
-`$ kubectl apply -f k8s/ingress.yaml`
+`$ kubectl apply -f web_material/k8s/ingress.yaml`
 
 This step will take several minutes to complete.
 
@@ -365,7 +365,7 @@ spec:
 
 Back in the Cloud Shell, execute the following command in the project root directory.
 
-`$ kubectl apply -f k8s/deployment.yaml`
+`$ kubectl apply -f web_material/k8s/deployment.yaml`
 
 This will update the pods with the new image, and if the update were successful, you should
 see the following page when you visit the static IP address:
