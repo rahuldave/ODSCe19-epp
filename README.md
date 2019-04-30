@@ -1,5 +1,7 @@
 ## Everybody please GET a GCP account!
 
+There's 300 bucks in free credits which will WAY cover this tutorial.
+
 # URL is https://github.com/rahuldave/ODSCe19-epp
 
 Slides are in performant.md /performant.pdf
