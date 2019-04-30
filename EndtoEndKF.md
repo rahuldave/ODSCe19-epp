@@ -9,60 +9,6 @@ This tutorial is a heavily edited version of <https://www.kubeflow.org/docs/gke/
 ## 1. Set up ksonnet app and model
 
 
-
-1. We first need to set up a project in GCP. Create a project called `kubeflowe2e` in the GCP console. This will create a project-id that looks something like `kubeflowe2e-238505`. Make sure that billing is enabled for your project. ————>Also make sure you use the zone `us-central1 ` for the purposes of this tutorial.
-2. Also choose a name for your `app`. We'll call it `myapp`. Remember this for now.
-3. Go to the following pages on the GCP Console and ensure that the specified APIs are enabled on your GCP account:
-   - [Compute Engine API](https://console.cloud.google.com/apis/library/compute.googleapis.com)
-   - [GKE API](https://console.cloud.google.com/apis/library/container.googleapis.com)
-   - [Identity and Access Management (IAM) API](https://console.cloud.google.com/apis/library/iam.googleapis.com)
-   - [Deployment Manager API](https://console.cloud.google.com/apis/library/deploymentmanager.googleapis.com)
-
-## 2. IAP
-
-
-
-3. The next step is to set up an OAuth Credential to use a [Cloud Identity-Aware Proxy (Cloud IAP)](https://cloud.google.com/iap/docs/) . To do this, first
-
-   1. Set up your OAuth [consent screen](https://console.cloud.google.com/apis/credentials/consent). For **Application Name** use `myapp`, for **support email**, use the email you used to set up GCP. For **Authorized Domain** use `<project-id>.cloud.goog`. The project-id will be of the form `kubeflowe2e-238505`, that is your preject name followed by a number. Now click **Save**.
-
-   2. Move over to the [credentials tab](https://console.cloud.google.com/apis/credentials) (it is to the left of the current screen in the current web page).
-
-      1. Click **Create credentials**, and then click **OAuth client ID**.
-      2. Under **Application type**, select **Web application**.
-      3. In the **Name** box enter any name for your OAuth client ID. This is *not* the name of your application nor the name of your Kubeflow deployment. It’s just a way to help you identify the OAuth client ID.
-      4. In the **Authorized redirect URIs** box, enter the following: `https://<app>.endpoints.<project-id>.cloud.goog/_gcp_gatekeeper/authenticate`. In place of `<app>` use `myapp` and for `<project-id>` use your project-id which will look something like this: `kubeflowe2e-238505`. For this example the endpoint will end up looking like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/_gcp_gatekeeper/authenticate`
-      5. Press **Enter/Return** to add the URI. Check that the URI now appears as a confirmed item under **Authorized redirect URIs**. (It should no longer be editable.)
-      6. Make note of the **client ID** and **client secret** that appear in the OAuth client window. You need them later to enable Cloud IAP.
-
-      
-
-      ## 3. Deploy using UI
-
-   taken from [here](https://www.kubeflow.org/docs/gke/deploy/deploy-ui/)
-
-   1. Open [https://deploy.kubeflow.cloud/](https://deploy.kubeflow.cloud/#/deploy) in your web browser.
-   2. Sign in using a GCP account that has administrator privileges for your GCP project.
-   3. Complete the form, following the instructions on the left side of the form. In particular, ensure that you enter the same **deployment name** as you used when creating the OAuth client ID.
-   4. Check **Skip IAP** box if you want to use basic auth.
-   5. Click **Create Deployment**.
-
-   Kubeflow will be available at the following URI:
-
-   ```
-   https://<app>.endpoints.<project-id>.cloud.goog/
-   ```
-
-   In our case here it would look like `https://myapp.endpoints.kubeflowe2e-238505.cloud.goog/`. It can take 10-15 minutes for the URI to become available. 
-
-   You can watch for updates in the information box on the deployment UI. If the deployment takes longer than expected, try accessing the above URI anyway.
-
-
-
-Take a look around the UI. 
-
-## 4. Set up ksonnet app and model
-
 In the cloud shell, you may need to run the command `source setup.sh`. You will need to do this any time you reconnect to the cloud shell.
 
  Lets clone down the code for our model

@@ -1,10 +1,12 @@
 autoscale: true
 
 #[fit]Performantly Scaling
-#[fit]Machine Learning
+#[fit]Machine Learning Algorithms
 
-## Rahul Dave, `univ.ai`
-## Richard Kim, `markovlabs`
+## Rahul Dave, `univ.ai` and `IACS`, Harvard
+## Richard Kim, `Markov Lab` and `IACS`, Harvard
+
+![inline, 60%](images/univai.png)
 
 ---
 
@@ -19,7 +21,7 @@ autoscale: true
 
 ---
 
-## Whats available in the market
+## Whats available in the market (LATER)
 
 - sagemager
 - google
@@ -127,14 +129,14 @@ best = choose_best_parameters(scores, parameters)
 
 
 
-##ok, so you want todo this
+##ok, so you want to do this
 
-To do it performantly, you will want to make sure you have the 
+### PERFORMANTLY, AND REPRODUCIBLY
 
 - same random seed
 - same programming environment on multiple machines (ideally same version of OS/python-conda stack/BLAS libraries, etc)
 - then run the same code with a different parameter combination on each machine
-- deal with the possible loss of some machines in this computation (they die, you got san amazon spot instance..)
+- deal with the possible loss of some machines in this computation (they die, you got an amazon spot instance..)
 - combine all the data output from these runs to make hyperparameter choices
 
 ---
@@ -276,6 +278,10 @@ Ok, so you now got repeatable environments. We next need to be
 
 and somehow manage all these machines...
 
+deal with downtime...
+
+enable fast iteration...
+
 ---
 
 ## Running in parallel: Dask
@@ -292,6 +298,27 @@ and somehow manage all these machines...
 ![inline](https://github.com/TomAugspurger/dask-tutorial-pycon-2018/raw/972fd9968a945c7e97a88214907758d5c98dd024/static/ml-dimensions-color.png)
 
 (from https://github.com/TomAugspurger/dask-tutorial-pycon-2018)
+
+---
+
+## sklearn pipelines: the bad 
+
+```python
+scores = []
+for ngram_range in parameters['vect__ngram_range']:
+        for norm in parameters['tfidf__norm']:
+                for alpha in parameters['clf__alpha']:
+                        vect = CountVectorizer(ngram_range=ngram_range)
+                        X2 = vect.fit_transform(X, y)
+                        tfidf = TfidfTransformer(norm=norm)
+                        X3 = tfidf.fit_transform(X2, y)
+                        clf = SGDClassifier(alpha=alpha)
+                        clf.fit(X3, y)
+                        scores.append(clf.score(X3, y))
+best = choose_best_parameters(scores, parameters)
+```
+
+![right, fit](images/unmerged_grid_search_graph.svg)
 
 ---
 
@@ -318,7 +345,7 @@ best = choose_best_parameters(scores, parameters)
 ---
 
 
-## Use Case 1: Hyperparameter optimization using dask
+## Hyperparameter optimization using dask
 
 ```python
 from keras.models import Sequential
@@ -327,7 +354,6 @@ from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from dask_ml.model_selection import GridSearchCV
-from dask.distributed import Client
 from sklearn.externals import joblib
 
 def simple_nn(hidden_neurons):
@@ -339,7 +365,6 @@ def simple_nn(hidden_neurons):
 
 param_grid = {'hidden_neurons': [100, 200, 300]}
 if __name__=='__main__':
-	client = Client()
 	cv = GridSearchCV(KerasClassifier(build_fn=simple_nn, epochs=30), param_grid)
 	X, y = load_breast_cancer(return_X_y=True)
 	X_train, X_test, y_train, y_test = train_test_split(X, y)
@@ -350,7 +375,7 @@ if __name__=='__main__':
 
 ---
 
-## Use case 2: Large Data Sets
+## Large Data Sets
 
 - important for pre-processing, 
 - also important for prediction on large data (test) sets
@@ -397,6 +422,152 @@ print(clf.labels_[:10].compute()) #actually run the stuff
 
 ---
 
+- the previous code runs locally. ideally we want to run on a cloud-provisioned cluster
+- and we'd like this cluster to be self-repairing
+- and then we'd like our code to respond to failures.
+- and expand onto more machines if we need them
+
+We need a:
+
+####[fit]cluster manager!
+
+---
+
+![](images/orchestration.png)
+
+# Enter 
+##[fit] Kubernetes
+
+---
+
+![left, fit](images/baskube.png)
+
+- OS for the cluster
+- provides service discovery, scaling, load-balancing, self-healing, leader election
+- think of applications as stateless, and movable from one machine to another to enable better resource utilization
+- thus does not cover mutable databases which must remain outside the cluster
+- there is a controlling master node, and worker nodes
+
+---
+
+## Basic Structure
+
+![left, inline](images/pods.png)![right, inline](images/clusters.png)
+
+---
+
+## Kubernetes Goals
+
+![left, inline](images/kubegoals.png)![right, inlone](images/kubegoals2.png)
+
+---
+
+## Deployment using `deployment.yaml`
+
+![inline](images/kubedeploy.png)
+
+---
+
+## Create a kubernetes cluster 
+
+### LETS DO IT TOGETHER
+
+---
+
+## Kubernetes Architecture
+
+![inline](images/kubearch.png)
+
+---
+
+![right, fit](images/kubecomp.png)
+
+**master node**:
+
+- API server, communicated with my control-plane components and you (using `kubectl`)
+- Scheduler, assigns a worker node to each application
+- Controller Manager, performs cluster-level functions, such as replicating components, keeping track of worker nodes, handling node failures
+- etcd, a reliable distributed data store that persistently stores the cluster configuration.
+
+
+---
+
+![left, fit](images/kubecomp.png)
+
+**worker node**:
+
+- Docker, to run your containers
+- you package your apps components into 1 or more docker images, and push them to a registry
+- Kubelet, which talks to the API server and manages containers on its node
+- kube-proxy, which load-balances network traffic between application components
+
+---
+
+- To run an application in Kubernetes, you post a description of your app to the Kubernetes API server.
+- people have created canned "descriptions" for multi-component software, which you can reuse. These use a "package manager" called `helm`, and its what is used to install dask and jupyterhub on a cluster
+- description includes info on component images, their relationship, which ones need co-location, and how many replicas
+- internal or external network services are also described. A lookup service is provided, and a given service is exposed at a particular ip address.  kube-proxy makes sure connec- tions to the service are load balanced 
+- master continuously makes sure that the deployed state of the application matches description
+  
+---
+
+## From nodes to horizontal labels
+
+![left, inline](images/kubelabels.png)
+
+![right, fit](images/kubecompare.png)
+
+---
+
+## Self Healing Deployments
+
+![left, inline](images/kubecompare2.png)![right, inline](images/kubecompare3.png)
+
+Used for deaths, consistency, and updating.
+
+---
+
+##Now, lets parallelize DASK
+
+- for data that fits into memory, we simply copy the memory to each node and run the algorithm there
+- if you have created a re-sizable cluster of parallel machines, `dask` can even dynamically send parameter combinations to more and more machines
+
+##[fit] Dask can run on Kubernetes
+
+---
+
+## Hyperparameter optimization using dask ON CLOUD
+
+```python
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from dask_ml.model_selection import GridSearchCV
+from dask.distributed import Client
+from sklearn.externals import joblib
+
+def simple_nn(hidden_neurons):
+  model = Sequential()
+  model.add(Dense(hidden_neurons, activation='relu', input_dim=30))
+  model.add(Dense(1, activation='sigmoid'))
+  model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+  return model
+
+param_grid = {'hidden_neurons': [100, 200, 300]}
+if __name__=='__main__':
+  client = Client()
+  print(client.cluster)
+	cv = GridSearchCV(KerasClassifier(build_fn=simple_nn, epochs=30), param_grid)
+	X, y = load_breast_cancer(return_X_y=True)
+	X_train, X_test, y_train, y_test = train_test_split(X, y)
+	with joblib.parallel_backend("dask", scatter=[X_train, y_train]):
+		cv.fit(X_train, y_train)
+	print(f'Best Accuracy for {cv.best_score_:.4} using {cv.best_params_}')
+```
+
+---
 
 ```python
 # run using local distributed scheduler
@@ -439,168 +610,61 @@ if __name__=='__main__':
 
 ---
 
-- the previous code runs locally. ideally we want to run on a cloud-provisioned cluster
-- and we'd like this cluster to be self-repairing
-- and then we'd like our code to respond to failures.
-- and expand onto more machines if we need them
-
-We need a:
-
-####[fit]cluster manager!
-
----
-
-![fit](images/orchestration.png)
-
----
-
-# Enter 
-##[fit] Kubernetes
-
----
-
-![left, fit](images/baskube.png)
-
-- OS for the cluster
-- provides service discovery, scaling, load-balancing, self-healing, leader election
-- think of applications as stateless, and movable from one machine to another to enable better resource utilization
-- thus does not cover mutable databases which must remain outside the cluster
-- there is a controlling master node, and worker nodes
-
----
-
-## Kubernetes Goals
-
-![left, inline](images/kubegoals.png)![right, inlone](images/kubegoals2.png)
-
----
-
-## Basic Structure
-
-![left, inline](images/pods.png)![right, inline](images/clusters.png)
-
----
-
-![right, fit](images/kubecomp.png)
-
-**master node**:
-
-- API server, communicated with my control-plane components and you (using `kubectl`)
-- Scheduler, assigns a worker node to each application
-- Controller Manager, performs cluster-level functions, such as replicating components, keeping track of worker nodes, handling node failures
-- etcd, a reliable distributed data store that persistently stores the cluster configuration.
-
-
----
-
-![left, fit](images/kubecomp.png)
-
-**worker node**:
-
-- Docker, to run your containers
-- you package your apps components into 1 or more docker images, and push them to a registry
-- Kubelet, which talks to the API server and manages containers on its node
-- kube-proxy, which load-balances network traffic between application components
-
----
-
-- To run an application in Kubernetes, you post a description of your app to the Kubernetes API server.
-- people have created canned "descriptions" for multi-component software, which you can reuse. These use a "package manager" called `helm`, and its what is used to install dask and jupyterhub on a cluster
-- description includes info on component images, their relationship, which ones need co-location, and how many replicas
-- internal or external network services are also described. A lookup service is provided, and a given service is exposed at a particular ip address.  kube-proxy makes sure connec- tions to the service are load balanced 
-- master continuously makes sure that the deployed state of the application matches description
-  
----
-
-![inline](images/kubearch.png)
-
----
-
-## Create a kubernetes cluster
-
----
-
-## Deployment using `deployment.yaml`
-
-![inline](images/kubedeploy.png)
-
----
-
-## Example: website with 3 replicas
-
-Image: 
-
-```Dockerfile
-FROM nginx:stable-alpine
-COPY  site/ /usr/share/nginx/html/
-EXPOSE 80
-```
-
-Namespace:
-
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: website
-```
-
-`deployment.yaml` ->
-
-![right, fit](images/depkub.png)
-
----
-
-## From nodes to horizontal labels
-
-![left, inline](images/kubelabels.png)
-
-![right, fit](images/kubecompare.png)
-
----
-
-## Self Healing Deployments
-
-![left, inline](images/kubecompare2.png)![right, inline](images/kubecompare3.png)
-
-Used for deaths, consistency, and updating.
-
----
-
-## Internal and External Networking
-
-right: internal networking
-
-below: external ingress
-
-![inline](images/ingkub.png) 
-
-![right, fit](images/servkub.png)
-
----
-
-##Now, lets parallelize
-
-- for data that fits into memory, we simply copy the memory to each node and run the algorithm there
-- if you have created a re-sizable cluster of parallel machines, `dask` can even dynamically send parameter combinations to more and more machines
-- see [PANGEO](https://pangeo.io/index.html)  for this 
-
-##[fit] Dask can run on Kubernetes
-
----
-
-
 ## Dask cloud deployment
 
 [Kubernetes is recommended](https://docs.dask.org/en/latest/setup/cloud.html)
 
-This can be done on your local machine using [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube/) or on any of the 3 major cloud prociders, Azure, GCP, or AWS.
+This can be done on your local machine using [Minikube](https://kubernetes.io/docs/getting-started-guides/minikube/) or on any of the 3 major cloud providers, Azure, GCP, or AWS. We will use GCP.
 
-1. [set up](https://zero-to-jupyterhub.readthedocs.io/en/v0.4-doc/create-k8s-cluster.html) a Kubernetes cluster
+1. We will [set up](https://zero-to-jupyterhub.readthedocs.io/en/v0.4-doc/create-k8s-cluster.html) a Kubernetes cluster
 2. Next you will [set up Helm](https://zero-to-jupyterhub.readthedocs.io/en/v0.4-doc/setup-helm.html), which is a package maner for Kubernetes which works simply by filling templated yaml files with variables also stored in another yaml file `values.yaml`.
 3. Finally you will install dask. First `helm repo update` and then `helm install stable/dask`. 
 
 See https://docs.dask.org/en/latest/setup/kubernetes-helm.html for all the details.
+
+---
+
+## Dask Setup
+
+## LETS DO IT TOGETHER
+
+---
+
+##[fit] Intro to Kubeflow 
+
+---
+
+The basic idea in Kubeflow is:
+
+**Everything runs in a docker container under Kubernetes**.
+
+This allows for autoscaling, revovery from downtime, and reproducibility.
+
+Thus each hyperparameter tuning run happens on a pod in a docker container. Each part of a pipeline runs in a pod in a docker container. Each part of a distributed deep learning run happens in docker containers running in multiple pods.
+
+Components are Notebooks, Hyperparameter Optimization (Katib), Pipelines, Model Serving (using Seldon and tf-serving).
+
+Support for Tensorflow, pytorch, Mxnet, etc
+
+---
+
+![inline](images/htd.png)
+
+(image from Hidden Technical Debt in ML systems)
+
+Kubeflow provides nice visualization for pipelines, hyperparameter runs, tensorflow runs, and more.
+
+---
+
+
+
+## Kubeflow Setup
+
+## LETS DO IT TOGETHER
+
+---
+
+## More on Kubeflow and KSonnet
 
 ---
 
@@ -649,3 +713,18 @@ See https://docs.dask.org/en/latest/setup/kubernetes-helm.html for all the detai
 - See [Alex Krizhevsky](http://arxiv.org/pdf/1404.5997v2), uses data parallelism in the convolutional layers and model parallelism in the dense layers.
 
 ---
+
+## Kubeflow Katib
+
+## LETS DO IT TOGETHER
+
+---
+
+## Running a deep learning model in Kubeflow
+
+## LETS DO IT TOGETHER
+
+---
+
+
+

@@ -128,6 +128,14 @@ dask-worker-77679f5c67-2gbxr      1/1       Running   0          7m
 dask-worker-77679f5c67-2nxcn      1/1       Running   0          7m
 ```
 
+We are going to make some custom changes, to include things like keras, and dask_ml
+
+```
+helm list
+helm upgrade dask stable/dask -f config.yaml
+helm status dask
+```
+
 ---
 
 ## Using Jupyter Lab with Dask
@@ -154,18 +162,7 @@ The default password is `dask`. This will take you to Jupyter Lab workspace.
 
 ---
 
-## PersistentVolume
-
-```yaml
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: jupyterhub-user-ssd
-provisioner: kubernetes.io/gce-pd
-parameters:
-  type: pd-ssd
-  zones: us-central1-a
-```
+We'll run some machine learning code with dask...
 
 ---
 
